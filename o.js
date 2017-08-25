@@ -61,7 +61,8 @@
             isCors: true,       // set this to false to disable CORS
             openAjaxRequests: 0,// a counter for all open ajax request to determine that are all ready TODO: Move this out of the config
             isHashRoute: true,  // set this var to false to disable automatic #-hash setting on routes
-            appending: ''		// set this value to append something to a any request. eg.: [{name:'apikey', value:'xyz'}]
+            appending: '',		// set this value to append something to a any request. eg.: [{name:'apikey', value:'xyz'}]
+            addSinglequotsOnIds: false
         };
 
         // +++
@@ -235,6 +236,10 @@
         // returns the object with the given id
         // +++
         base.find = function (getId) {
+            if (base.oConfig.addSinglequotsOnIds && getId[0] !== '\'') {
+                getId = '\'' + getId + '\'';
+            }
+
             resource.path[resource.path.length - 1].get = getId;
             return (base);
         }
@@ -655,7 +660,11 @@
             if (isArray(filterList)) {
                 var filterStr = "", arr = [];
                 for (i = 0; i < filterList.length; ++i) {
-                    arr[i] = '(' + column + ' ' + operation + ' ' + filterList[i][column] + ')';
+                    if (filterList[i][column] !== '\'') {
+                        arr[i] = '(' + column + ' ' + operation + ' \'' + filterList[i][column] + '\')';
+                    } else {
+                        arr[i] = '(' + column + ' ' + operation + ' ' + filterList[i][column] + ')';
+                    }
                 }
                 filterStr = arr.join(' ' + combine + ' ');
                 return (filterStr);
