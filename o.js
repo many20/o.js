@@ -605,9 +605,9 @@
         // +++
         // Adds a filter to exclude data from a existing data-result
         // +++
-        base.filterByList = base.exclude = function (column, data) {
+        base.filterByList = base.exclude = function (column, data, filterValueModificator) {
             if (!isQueryThrowEx('$filter')) {
-                var filterStr = buildFilterByData(column, data, opertionMapping['!='], opertionMapping['&&']);
+                var filterStr = buildFilterByData(column, data, opertionMapping['!='], opertionMapping['&&'], filterValueModificator);
                 addQuery('$filter', checkEmpty(filterStr), filterStr);
             }
             return (base);
@@ -616,9 +616,9 @@
         // +++
         // Adds a filter to include data from a existing data-result
         // +++
-        base.include = function (column, data) {
+        base.include = function (column, data, filterValueModificator) {
             if (!isQueryThrowEx('$filter')) {
-                var filterStr = buildFilterByData(column, data, opertionMapping['=='], opertionMapping['||']);
+                var filterStr = buildFilterByData(column, data, opertionMapping['=='], opertionMapping['||'], filterValueModificator);
                 addQuery('$filter', checkEmpty(filterStr), filterStr);
             }
             return (base);
@@ -656,12 +656,12 @@
         // +++
         // builds a filter by a given data object to include or exclude values on a query
         // +++
-        function buildFilterByData(column, filterList, operation, combine) {
+        function buildFilterByData(column, filterList, operation, combine, filterValueModificator) {
             if (isArray(filterList)) {
                 var filterStr = "", arr = [];
                 for (i = 0; i < filterList.length; ++i) {
-                    if (filterList[i][column] !== '\'') {
-                        arr[i] = '(' + column + ' ' + operation + ' \'' + filterList[i][column] + '\')';
+                    if (!!filterValueModificator) {
+                        arr[i] = '(' + column + ' ' + operation + ' ' + filterValueModificator(filterList[i][column]) + ')';
                     } else {
                         arr[i] = '(' + column + ' ' + operation + ' ' + filterList[i][column] + ')';
                     }
